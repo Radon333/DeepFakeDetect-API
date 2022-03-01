@@ -4,7 +4,6 @@
 #
 #    pip-compile
 #
-opencv-python==4.5.5.62
 opencv-python-headless
 absl-py==0.15.0
 uvicorn
