@@ -1,3 +1,4 @@
+import imghdr
 import numpy as np
 import json
 import io
@@ -29,7 +30,7 @@ BLACK_COLOR = (0, 0, 0)
 RED_COLOR = (0, 0, 255)
 GREEN_COLOR = (0, 128, 0)
 BLUE_COLOR = (255, 0, 0)
-
+bg_img=0
 
 app = FastAPI()
 app.add_middleware(
@@ -332,12 +333,14 @@ def plot_landmarks(landmark_list: landmark_pb2.NormalizedLandmarkList,
 async def root():
     return {"message": "Deep-Fake Detector"}
 
+
 @app.post("/predict")
 async def root(file: UploadFile = File(...)):
     global model
     global store_coordinates
     global store_faces
     global store_mesh
+    global bg_img
 
     content = await file.read()
     nparr = np.fromstring(content, np.uint8)
@@ -392,9 +395,12 @@ async def root(file: UploadFile = File(...)):
     
     res,im_png = cv2.imencode(".png", bg_img)
     return StreamingResponse(io.BytesIO(im_png.tobytes()), media_type="image/png")
-
+    
+@app.get("/predict")
+async def resp():
+    global bg_img
+    res,im_png = cv2.imencode(".png", bg_img)
+    return StreamingResponse(io.BytesIO(im_png.tobytes()), media_type="image/png")
     #test=img.astype(np.float32)
     #prediction = model.predict(prepare(test))
     #return json.dumps(prediction.tolist())
-
-    
